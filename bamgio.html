@@ -180,7 +180,7 @@
 
                     let item = document.createElement('div');
                     let icon = `
-                    <span class="timer">Xe số ${e.target.textContent} - ${TimeToDate(CountDown())}</span>
+                    <span class="timer"><input class="form-control" type="text" value="Xe số ${e.target.textContent} - ${TimeToDate(CountDown())}"></span>
                     <button class="btn" onclick="DeleteCar(${e.target.textContent})">
                         <i class="fa-solid fa-square-xmark fs-5"></i>
                     </button>
@@ -251,11 +251,13 @@
                 const timer = document.querySelectorAll('.timer');
 
                 timer.forEach(element => {
-                    let newTime = SliceCar(element.textContent);;
+                    let e = element.children[0].value;
+
+                    let newTime = SliceCar(e);;
                     let oldTime = TimeToDate(DateToTime(myTimer()));
 
                     if (newTime == oldTime) {
-                        ThongBao(element.textContent.slice(0, 8));
+                        ThongBao(e.slice(0, 8));
                     }
                 });
             }
