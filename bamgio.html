@@ -154,6 +154,9 @@
         const nontification = document.getElementById('nontification');
         const inputField = document.getElementById('inputField');
         let ss = 0;
+        let checkChangeCar = false;
+        let idOldCar = 0;
+        let oldTime = '00:00:00';
 
         Alert.style.visibility = 'hidden';
 
@@ -178,23 +181,59 @@
 
                 } else {
 
-                    let item = document.createElement('div');
-                    let icon = `
-                    <span class="timer"><input class="form-control" type="text" value="Xe số ${e.target.textContent} - ${TimeToDate(CountDown())}"></span>
-                    <button class="btn" onclick="DeleteCar(${e.target.textContent})">
-                        <i class="fa-solid fa-square-xmark fs-5"></i>
-                    </button>
-                    `;
-                    item.classList.add('item');
-                    item.id = e.target.textContent;
-                    item.innerHTML = icon;
-                    // item.textContent = `${TimeToDate(CountDown())}`;
+                    if (checkChangeCar) {
+                        btn.forEach(element => {
+                            if (element.classList.contains('bg-danger')) {
+                                element.classList.remove('bg-danger');
+                                checkChangeCar = false;
+                            }
+                        });
+                        const changeCar = document.getElementById(idOldCar);
+                        oldTime = SliceCar(changeCar.children[0].textContent);
 
-                    HiddenCar(item, e.target.textContent);
+                        AddCar(e, 1);
+
+                        document.getElementById(idOldCar).remove();
+                        document.getElementById(`xe${idOldCar}`).removeAttribute('disabled');
+                    } else {
+                        AddCar(e, 0);
+                    }
+
                 }
 
             });
         });
+
+        function AddCar(e, number) {
+            // nếu là 1 nghĩa là thay đổi xe
+            // nếu là 0 nghĩa là thêm xe mới
+
+            let item = document.createElement('div');
+            let icon = '';
+
+            if (number === 1) {
+                icon = `
+                        <span class="timer">Xe số ${e.target.textContent} - ${oldTime}<button class="btn btn-primary" id="${e.target.textContent}">Đổi xe</button></span>
+                        <button class="btn" onclick="DeleteCar(${e.target.textContent})">
+                            <i class="fa-solid fa-square-xmark fs-5"></i>
+                        </button>
+                        `;
+            } else {
+                icon = `
+                        <span class="timer">Xe số ${e.target.textContent} - ${TimeToDate(CountDown())}<button class="btn btn-primary" id="${e.target.textContent}">Đổi xe</button></span>
+                        <button class="btn" onclick="DeleteCar(${e.target.textContent})">
+                            <i class="fa-solid fa-square-xmark fs-5"></i>
+                        </button>
+                        `;
+            }
+
+            item.classList.add('item');
+            item.id = e.target.textContent;
+            item.innerHTML = icon;
+            // item.textContent = `${TimeToDate(CountDown())}`;
+
+            HiddenCar(item, e.target.textContent);
+        }
 
         function DateToTime(d) {
             let hh = Math.floor(d.getHours() * 3600);
@@ -251,14 +290,15 @@
                 const timer = document.querySelectorAll('.timer');
 
                 timer.forEach(element => {
-                    let e = element.children[0].value;
 
-                    let newTime = SliceCar(e);;
-                    let oldTime = TimeToDate(DateToTime(myTimer()));
+                    let oldTime = SliceCar(element.textContent);
+                    let newTime = TimeToDate(DateToTime(myTimer()));
 
                     if (newTime == oldTime) {
-                        ThongBao(e.slice(0, 8));
+                        ThongBao(element.textContent.slice(0, 8));
                     }
+
+                    ChangeCar(element);
                 });
             }
         }
@@ -278,8 +318,21 @@
             }
         }
 
+        function ChangeCar(element) {
+            element.children[0].addEventListener('click', function (event) {
+                btn.forEach(e => {
+                    if (!e.hasAttribute('disabled')) {
+                        e.classList.add('bg-danger');
+                        checkChangeCar = true;
+                    } else {
+                        idOldCar = event.target.id;
+                    }
+                });
+            })
+        }
+
         function SliceCar(string) {
-            let newstring = string.slice(-8, string.length);
+            let newstring = string.slice(-14, -6);
             return newstring;
         }
 
